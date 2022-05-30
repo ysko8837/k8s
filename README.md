@@ -88,23 +88,22 @@ master, node1,node2, node3 시스템에 kubeadm, kubectl, kubelet 설치 및 동
 	# systemctl start kubelet && systemctl enable kubelet
 
 ## add. 도커 대몬 교체
-cat > /etc/docker/daemon.json <<EOF
-{
-  "exec-opts": ["native.cgroupdriver=systemd"],
-  "log-driver": "json-file",
-  "log-opts": {
-    "max-size": "100m"
-  },
-  "storage-driver": "overlay2"
-}
-EOF
+	...
+	cat > /etc/docker/daemon.json <<EOF
+	{
+	  "exec-opts": ["native.cgroupdriver=systemd"],
+	  "log-driver": "json-file",
+	  "log-opts": {
+	    "max-size": "100m"
+	  },
+	  "storage-driver": "overlay2"
+	}
+	EOF
 
-$ sudo mkdir -p /etc/systemd/system/docker.service.d
-
-# 도커 서비스 재시작
-$ sudo systemctl daemon-reload
-$ sudo systemctl restart docker
-
+	$ sudo mkdir -p /etc/systemd/system/docker.service.d
+	$ sudo systemctl daemon-reload
+	$ sudo systemctl restart docker
+	...
 ## 3. Master 컴포넌트 구성및 네트워크 환경구성
 master 시스템에서만 구성 
 ### Creating a single control-plane cluster with kubeadm
