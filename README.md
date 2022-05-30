@@ -87,6 +87,23 @@ master, node1,node2, node3 시스템에 kubeadm, kubectl, kubelet 설치 및 동
 	# yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 	# systemctl start kubelet && systemctl enable kubelet
 
+## add. 도커 대몬 교체
+cat > /etc/docker/daemon.json <<EOF
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2"
+}
+EOF
+
+$ sudo mkdir -p /etc/systemd/system/docker.service.d
+
+# 도커 서비스 재시작
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart docker
 
 ## 3. Master 컴포넌트 구성및 네트워크 환경구성
 master 시스템에서만 구성 
@@ -120,9 +137,9 @@ master 시스템에서만 구성
 Weave Net works
 
 	# kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
-
+	
 	# kubectl get nodes
-
+=> 안될경우, # kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 ## 4. Worker Node 구성
 node1, node2, node3에서 실행
 master의 **kubeadm init** 명령 실행시 출력된 토큰을 가지고 마스터와 연결
