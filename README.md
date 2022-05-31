@@ -167,8 +167,7 @@ master의 **kubeadm init** 명령 실행시 출력된 토큰을 가지고 마스
 	master.example.com   Ready    master   10m   v1.18.0
 	node1.example.com    Ready    <none>   17m   v1.18.0
 	node2.example.com    Ready    <none>   17m   v1.18.0
-	node3.example.com    Ready    <none>   17m   v1.18.0
-=> refused? docker rm $(docker ps -a -q) 해보자!	
+	node3.example.com    Ready    <none>   17m   v1.18.0	
 	
 ## 5. bash shell에서 [TAB]키를 이용해 kubernetes command 자동완성 구성하기
 	
@@ -182,7 +181,8 @@ master의 **kubeadm init** 명령 실행시 출력된 토큰을 가지고 마스
 	2. kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 	3. cat > example.yaml 
 	4. kubectl create -f example.yaml
-	5. 1~4 방법으로 성공
+	5. kubectl get pods -o wide (node ip 확인하고)
+	6. curl 10.244.1.2 (nginx 응답 확인 ok!!) 
 
 ## 6. 실습 : 간단한 yaml 파일을 생성해서 nginx를 배포해보자.
 	1. 아래와 같은 example.yaml을 생성한다.
