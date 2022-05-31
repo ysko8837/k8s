@@ -133,7 +133,6 @@ master 시스템에서만 구성
 	...
 	kubeadm join 10.100.0.104:6443 --token 1ou05o.kkist9u6fbc2uhp3 --discovery-token-ca-cert-hash sha256:8d9a7308ea6ff73.........576c112f326690
 
-
 **kubeadm init** 명령실행시 master에 kubernetes 컴포넌트들이 생성된다. 
 출력 결과에서 위의 내용중 mkdir, cp, chown 명령을 kubernetes 관리자 계정에서 실행한다.
 
@@ -154,7 +153,7 @@ Weave Net works
 	# kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 	
 	# kubectl get nodes
-=> 안될경우, # kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml (추천?)
+=> 안될경우, # kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml (추천)
 ## 4. Worker Node 구성
 node1, node2, node3에서 실행
 master의 **kubeadm init** 명령 실행시 출력된 토큰을 가지고 마스터와 연결
@@ -179,6 +178,12 @@ master의 **kubeadm init** 명령 실행시 출력된 토큰을 가지고 마스
 	# echo "source <(kubeadm completion bash)" >> ~/.bashrc
 
 ## 6. 실습 : 간단한 yaml 파일을 생성해서 nginx를 배포해보자.
+=>성공 사례
+1. kubeadm init --apiserver-advertise-address=10.0.1.4 --pod-network-cidr=10.244.0.0/16 
+2. kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+3. cat > example.yaml 
+4. kubectl create -f example.yaml
+5. 1~4 방법으로 성공
 
 	1. 아래와 같은 example.yaml을 생성한다.
 	$ cat > example.yaml
