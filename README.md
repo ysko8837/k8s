@@ -183,6 +183,9 @@ master의 **kubeadm init** 명령 실행시 출력된 토큰을 가지고 마스
 	4. kubectl create -f example.yaml
 	5. kubectl get pods -o wide (node ip 확인하고)
 	6. curl 10.244.1.2 (nginx 응답 확인 ok!!) 
+	7. 앞선 실패 원인이 mac주소 중복일 수 있음(virtualbox 네트워크에서 변경 가능)
+	 => MAC 주소 및 product_uuid가 모든 노드에 대해 고유해야 하며
+            (ifconfig -a MAC 주소를 확인, product_uuid는 sudo cat /sys/class/dmi/id/product_uuid 확인)
 
 ## 6. 실습 : 간단한 yaml 파일을 생성해서 nginx를 배포해보자.
 	1. 아래와 같은 example.yaml을 생성한다.
