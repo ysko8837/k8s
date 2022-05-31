@@ -177,14 +177,14 @@ master의 **kubeadm init** 명령 실행시 출력된 토큰을 가지고 마스
 	# source <(kubeadm completion bash)
 	# echo "source <(kubeadm completion bash)" >> ~/.bashrc
 
-## 6. 실습 : 간단한 yaml 파일을 생성해서 nginx를 배포해보자.
-=>성공 사례
-1. kubeadm init --apiserver-advertise-address=10.0.1.4 --pod-network-cidr=10.244.0.0/16 
-2. kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-3. cat > example.yaml 
-4. kubectl create -f example.yaml
-5. 1~4 방법으로 성공
+## add. 성공사례
+	1. kubeadm init --apiserver-advertise-address=10.0.1.4 --pod-network-cidr=10.244.0.0/16 
+	2. kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+	3. cat > example.yaml 
+	4. kubectl create -f example.yaml
+	5. 1~4 방법으로 성공
 
+## 6. 실습 : 간단한 yaml 파일을 생성해서 nginx를 배포해보자.
 	1. 아래와 같은 example.yaml을 생성한다.
 	$ cat > example.yaml
 	apiVersion: apps/v1
