@@ -149,6 +149,7 @@ master 시스템에서만 구성
 
 ### Installing a Pod network add-on
 Weave Net works
+	# kubectl delete -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 
 	# kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 	
