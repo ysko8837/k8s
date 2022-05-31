@@ -150,7 +150,7 @@ Weave Net works
 	# kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 	
 	# kubectl get nodes
-=> 안될경우, # kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+=> 안될경우, # kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml (추천?)
 ## 4. Worker Node 구성
 node1, node2, node3에서 실행
 master의 **kubeadm init** 명령 실행시 출력된 토큰을 가지고 마스터와 연결
@@ -165,7 +165,7 @@ master의 **kubeadm init** 명령 실행시 출력된 토큰을 가지고 마스
 	node1.example.com    Ready    <none>   17m   v1.18.0
 	node2.example.com    Ready    <none>   17m   v1.18.0
 	node3.example.com    Ready    <none>   17m   v1.18.0
-	
+=> refused? docker rm $(docker ps -a -q) 해보자!	
 	
 ## 5. bash shell에서 [TAB]키를 이용해 kubernetes command 자동완성 구성하기
 	
