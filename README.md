@@ -190,7 +190,9 @@ master의 **kubeadm init** 명령 실행시 출력된 토큰을 가지고 마스
 ## add. deployment
    1. run은 1개 실행
    2. create deployment를 활용하여 관리 가능
-      	# kubectl create deployment mainui --image=httpd --replicas=3 deployment로 생성
+   
+      	
+	# kubectl create deployment mainui --image=httpd --replicas=3 deployment로 생성
 	# kubectl get deployments.apps deploy로 축약가능
 	# kubectl get pods -o wide 자세히보기 
 	# kubectl get pod mainui-77fc86948f-pctm8 -o json json형식으로 보기
