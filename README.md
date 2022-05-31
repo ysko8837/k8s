@@ -186,6 +186,23 @@ master의 **kubeadm init** 명령 실행시 출력된 토큰을 가지고 마스
 	7. 앞선 실패 원인이 mac주소 중복일 수 있음(virtualbox 네트워크에서 변경 가능)
 	 => MAC 주소 및 product_uuid가 모든 노드에 대해 고유해야 하며
             (ifconfig -a MAC 주소를 확인, product_uuid는 sudo cat /sys/class/dmi/id/product_uuid 확인)
+	    
+## add. deployment
+   1. run은 1개 실행
+   2. create deployment를 활용하여 관리 가능
+      	# kubectl create deployment mainui --image=httpd --replicas=3 deployment로 생성
+	# kubectl get deployments.apps deploy로 축약가능
+	# kubectl get pods -o wide 자세히보기 
+	# kubectl get pod mainui-77fc86948f-pctm8 -o json json형식으로 보기
+	# kubectl get pod mainui-77fc86948f-pctm8 -o yaml yaml형식으로 보기
+	# kubectl exec deploy-exam-8f458dc5b-khx7h -it -- /bin/bash 안에 들어가서 수정하기 
+	# kubectl port-forward deploy-exam-8f458dc5b-khx7h 8081:80 port 변경
+	# kubectl logs deploy-exam-8f458dc5b-khx7h log확인
+	# kubectl edit deployments.apps mainui 실행중인 오브젝트 수정
+	# kubectl run webserver --image=nginx:1.14 --port 80 --dry-run=client -o yaml > webserver-pod.yaml 
+	  (dry-run은 동작확인만, -o yaml 형태로, > 를 이용하여 저장)
+	# kubectl delete pod webserver 실행중인 pod 삭제
+	# kubectl create -f webserver-pod.yaml
 
 ## 6. 실습 : 간단한 yaml 파일을 생성해서 nginx를 배포해보자.
 	1. 아래와 같은 example.yaml을 생성한다.
@@ -225,4 +242,4 @@ master의 **kubeadm init** 명령 실행시 출력된 토큰을 가지고 마스
 	$ kubectl get pod -o wide
 
 	4. 생성된 deploy를 제거한다.
-	$ kubectl delete deploy deploy-exam
+	$ kubectl delete deploy deploy-exam 
