@@ -107,6 +107,15 @@ master, node1,node2, node3 시스템에 kubeadm, kubectl, kubelet 설치 및 동
 ## add. vitualbox의 node들 ip 세팅 필요(NAT 네트워크)
 https://coffeewhale.com/kubernetes/cluster/virtualbox/2020/08/31/k8s-virtualbox/
 
+## add. 초기화
+	$ systemctl stop kubelet
+	$ docker rm -f $(docker ps -aq)
+	$ docker rmi -f $(docker images -q)
+	$ systemctl restart docker
+	$ systemctl start kubelet
+	$ rm -f  ~/.kube/config
+	$ kubeadm reset
+
 ## 3. Master 컴포넌트 구성및 네트워크 환경구성
 master 시스템에서만 구성 
 ### Creating a single control-plane cluster with kubeadm
@@ -162,7 +171,8 @@ master의 **kubeadm init** 명령 실행시 출력된 토큰을 가지고 마스
 	
 	# source <(kubectl completion bash)
 	# echo "source <(kubectl completion bash)" >> ~/.bashrc
-
+	# source <(kubeadm completion bash)
+	# echo "source <(kubeadm completion bash)" >> ~/.bashrc
 
 ## 6. 실습 : 간단한 yaml 파일을 생성해서 nginx를 배포해보자.
 
