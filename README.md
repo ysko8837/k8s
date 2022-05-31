@@ -1,5 +1,8 @@
 # Kubernetes 실습환경구성
 
+* 장애발생 시, 아래 블로그 참고
+* https://yooloo.tistory.com/203?category=0
+
 **Single Master, Multi node Kubernets** 환경을 구성합니다.
 
 |HOST|IP address  | arch | CPU | Memory | OS |
