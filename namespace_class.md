@@ -6,5 +6,6 @@
       kubectl config set-context blue@kubernetes --cluster=kubernetes --user=kubernetes-admin --namespace=bule #같은 형식으로 context 생성
       kubectl config view 
       kubectl config current-context
-      kubectl config use-context blue@kubernetes #변경
-      kubectl delete pods mypod -n default #default namespace의 pod 삭제
+      kubectl config use-context blue@kubernetes            #변경
+      kubectl delete namespaces blue                        #blue namespace 삭제
+      kubectl delete pods mypod -n default                  #default namespace의 pod 삭제
