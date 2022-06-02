@@ -1,4 +1,4 @@
-# pod
+# pod 생성
 ```
 kubectl run web1 --image=nginx:1.14 --port=80 -n orange  #cli 를 통한 pod 생성
 kubectl config use-context orange@kubernertes            # default 변경
@@ -11,3 +11,4 @@ kubectl get pods web1 -o json | grep -i podip            #특정 부분만 확�
 
 ```
 
+# multi-container pod 생성
