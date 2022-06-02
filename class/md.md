@@ -29,4 +29,4 @@
 
 - 상단 `Actios` Tab 을 클릭한다.
 
-    <img src = "../../_image/action_actions.png" alt="Actions" width="100%" height="100%" />
+    <img src = "../_image/action_actions.png" alt="Actions" width="100%" height="100%" />
