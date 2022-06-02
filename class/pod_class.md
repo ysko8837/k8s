@@ -42,5 +42,6 @@ kubectl create -f nginx_run.yaml #nginx pod 실행
 
 - pod 
 ``` 
-kubectl get pods -o wide --watch
+kubectl get pods -o wide --watch  #동작중인 상태를 자세하게 보여줌
+kubectl delete pod nginx-pod #삭제를 다른 터미널에서 실행하면, 위의 watch에 단계별로 정보 표시
 ```
