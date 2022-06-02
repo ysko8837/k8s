@@ -31,3 +31,16 @@ kubectl exec multipod -c centos-container -it -- /bin/bash  #해당 pod의 cento
 kubectl logs multipod -c nginx-container  #해당 pod의 nginx-container라는 container의 로그를 확인
 ```
 
+
+# pod flow 이해
+- 사전작업
+``` 
+watch kubuctl get pods -o wide #2초마다 확인
+kubectl delete pod --all #기존 pod 모두 삭제
+kubectl create -f nginx_run.yaml #nginx pod 실행
+```
+
+- pod 
+``` 
+kubectl get pods -o wide --watch
+```
