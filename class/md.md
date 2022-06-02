@@ -28,5 +28,5 @@
     <https://link-url/>
 
 - 상단 `Actios` Tab 을 클릭한다.
-
+![action_actions](https://user-images.githubusercontent.com/105267351/171559360-26afdc1b-544e-422d-b00b-4f247bcc09b9.png)
     <img src = "../_image/action_actions.png" alt="Actions" width="100%" height="100%" />
