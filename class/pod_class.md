@@ -45,3 +45,21 @@ kubectl create -f nginx_run.yaml #nginx pod 실행
 kubectl get pods -o wide --watch  #동작중인 상태를 자세하게 보여줌
 kubectl delete pod nginx-pod #삭제를 다른 터미널에서 실행하면, 위의 watch에 단계별로 정보 표시
 ```
+- 5-1-2강좌 exam
+```
+  464  kubectl get pods
+  465  kubectl get pods --all-namespaces
+  466  kubectl run nginx-pod --image=nginx:1.14 --port=80
+  467  kubectl get pods -o wide
+  473  kubectl get pods nginx-pod -o yaml | grep -i image
+  474  kubectl get pods -o wide
+  475  kubectl describe pod nginx-pod
+  476  kubectl get pods
+  477  kubectl delete pod nginx-pod  
+  479  kubectl run redis123 --image=redis --dry-run=client -o yaml > redis.yaml
+  480  cat redis.yaml
+  481  vi redis.yaml
+  482  kubectl create -f redis.yaml
+  483  kubectl get pods  
+  485  kubectl edit pod redis123  
+```
