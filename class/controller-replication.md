@@ -6,7 +6,7 @@
   - selector의 key:value는 template.metadata.labels로 반드시 포함하고 있어야 함(key:value)
   
 ```
-# kubectl edit deploy xxx
+# kubectl edit deploy xxx (deploy를 통한 replica)
 apiVersion: apps/v1
 kind: Deployment
 spec:
@@ -20,4 +20,25 @@ spec:
       creationTimestamp: null
       labels:
         app: mainui
+```
+
+```
+# rc-nginx.yaml replicationController를 통한 replica
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: rc-nginx
+spec:
+  replicas: 3
+  selector:
+    app: webui
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        app: webui
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:1.14
 ```
