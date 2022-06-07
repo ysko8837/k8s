@@ -4,5 +4,27 @@
 
 
 ```
-#
+# yaml에 환경변수 지정
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+spec:
+  containers:
+  - image: nginx:1.14
+    name: nginx-container
+    ports:
+    - containerPort: 80
+      protocol: TCP
+    env:
+    - name: MYVAR
+      value: "testvalue"
+    - name: MYVAR2
+      value: "testvalue2"
+```
+
+```
+# env 확인(위에 정의한 환경변수 확인 가능)
+kubectl exec nginx-pod -it -- /bin/bash
+=> env
 ```
