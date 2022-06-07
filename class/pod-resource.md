@@ -14,13 +14,13 @@ spec:
     ports:
     - containerPort: 80
       protocol: TCP
-    resources:
-      `limits:
+    **resources:
+      limits:
         cpu: "1"
         memory: 1Gi
       requests:
         cpu: 200m
-        memory: 500Mi`
+        memory: 500Mi**
 
 ```
 
