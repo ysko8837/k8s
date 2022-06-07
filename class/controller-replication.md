@@ -5,8 +5,9 @@
   - 기본구성 : selector, replicas, template
   - selector의 key:value는 template.metadata.labels로 반드시 포함하고 있어야 함(key:value)
   
+## deploy를 통한 replica  
 ```
-# kubectl edit deploy xxx (deploy를 통한 replica)
+# kubectl edit deploy xxx
 apiVersion: apps/v1
 kind: Deployment
 spec:
@@ -22,6 +23,7 @@ spec:
         app: mainui
 ```
 
+## ReplicationController를 통한 replica 
 ```
 # rc-nginx.yaml replicationController를 통한 replica
 apiVersion: v1
@@ -42,3 +44,4 @@ spec:
       - name: nginx-container
         image: nginx:1.14
 ```
+
