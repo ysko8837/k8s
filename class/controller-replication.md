@@ -24,6 +24,7 @@ spec:
 ```
 
 ## ReplicationController를 통한 replica 
+### rc로 생성
 ```
 # rc-nginx.yaml replicationController를 통한 replica
 apiVersion: v1
@@ -44,24 +45,33 @@ spec:
       - name: nginx-container
         image: nginx:1.14
 ```
-
-### history
 ```
-cat > rc-nginx.yaml
+cat > rc-nginx.yaml    # 위 내용으로 생성
 kubectl create -f rc-nginx.yaml
-kubectl describe rc rc-nginx
-
+kubectl describe rc rc-nginx  # kind가 ReplicationController(rc) 이므로
 ```
 
-## 
+### controller 특징
 ```
 kubectl run redis --image=redis --labels=app=webui --dry-run=client -o yaml > redis.yaml
-  890  kubectl run redis --image=redis --labels=app=webui --dry-run=client -o yaml
-  891  vi redis.yaml
-  892  kubectl get pods --show-labels
-  893  kubectl create -f redis.yaml
-  894  kubectl edit rc rc-nginx
-  895  kubectl scale rc rc-nginx --replicas=2
-  896  kubectl get rc
+vi redis.yaml
+kubectl create -f redis.yaml # webui라는 redis 생성 명령
+kubectl get pods --show-labels  # 라벨이 webui로 같으므로 rc는 redis를 생성하지 못함(rc는 selector만 확인하고 replica수가 맞아서 생성안됨)
 ```
 
+### scale out/down
+```
+kubectl edit rc rc-nginx                # 방법 1
+kubectl scale rc rc-nginx --replicas=2  # 방법 2  
+```
+
+
+### 롤링 업데이트
+```
+kubectl edit rc rc-nginx  # template의 nginx 버전을 1.15로 변경
+kubectl get pods -o wide  # pod name 확인
+kubectl edit pod rc-nginx-spk2s # nginx 버전 확인(1.14로 유지되며 변경안됨)
+kubectl delete pod rc-nginx-spk2s # 해당 pod 삭제
+kubectl get pods -o wide  # 재생성된 pod name 확인
+kubectl edit pod rc-nginx-7zmz6 # 재생성된 pod의 nginx 버전 확인(1.15로 변경됨)
+```
