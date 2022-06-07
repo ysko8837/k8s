@@ -45,3 +45,23 @@ spec:
         image: nginx:1.14
 ```
 
+### history
+```
+cat > rc-nginx.yaml
+kubectl create -f rc-nginx.yaml
+kubectl describe rc rc-nginx
+
+```
+
+## 
+```
+kubectl run redis --image=redis --labels=app=webui --dry-run=client -o yaml > redis.yaml
+  890  kubectl run redis --image=redis --labels=app=webui --dry-run=client -o yaml
+  891  vi redis.yaml
+  892  kubectl get pods --show-labels
+  893  kubectl create -f redis.yaml
+  894  kubectl edit rc rc-nginx
+  895  kubectl scale rc rc-nginx --replicas=2
+  896  kubectl get rc
+```
+
