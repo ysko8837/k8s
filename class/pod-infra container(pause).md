@@ -9,3 +9,9 @@
 ssh ysko@node2 -p 2222
 docker ps
 ```
+
+
+```
+# 파일전송(대문자 P)
+scp -P 2222 redis.yaml ysko@node2:/home/ysko/
+```
