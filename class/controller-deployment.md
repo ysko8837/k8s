@@ -67,7 +67,10 @@ deployment "app-deploy" successfully rolled out
 
 ## record 
   - --record 옵션으로 기록
-  - status / history / pause / resume
+  - status / history / pause / resume 가능
+  - spec.revisionHistoryLimit: 10 으로 # history 보관 수 결정 가능
+  - spec.progressDeadlineSeconds: 600 # 600초 이상인경우 롤백 됨
+  - spec.strategy.rollingUpdate.maxSurge: 25% 
   - kubectl rollout status deployment `<name>` 
   - kubectl rollout history deployment `<name>` 
   - kubectl rollout pause/resume deployment `<name>`
@@ -77,3 +80,39 @@ deployment "app-deploy" successfully rolled out
   - ReplicaController, ReplicaSet, Deployment, static(/var/lib/kubelet/config.yaml 에서 확인)를 삭제해야 함
   - 상위만 삭제하고 pod를 놔둘경우 --cascade=false 옵션 추가
 
+# Rolling back
+  - kubectl rollout --help
+  - kubectl rollout restart deploy app-deploy # 롤링된 결과를 재시작
+  - kubectl rollout undo deploy app-deploy # 이전 revision으로 롤백
+  - kubectl rollout undo deploy app-deploy --to-revision=3 # history 3번으로 롤백
+
+```
+kubectl rollout history deploy app-deploy
+1         kubectl create --filename=deploymen-exam1.yaml --record=true
+2         kubectl set image deployment app-deploy web=nginx:1.15 --record=true
+3         kubectl set image deployment app-deploy web=nginx:1.16 --record=true
+4         kubectl set image deployment app-deploy web=nginx:1.17 --record=true
+5         kubectl set image deployment app-deploy web=nginx:1.18 --record=true
+kubectl rollout undo deploy app-deploy
+kubectl rollout history deploy app-deploy
+1         kubectl create --filename=deploymen-exam1.yaml --record=true
+2         kubectl set image deployment app-deploy web=nginx:1.15 --record=true
+3         kubectl set image deployment app-deploy web=nginx:1.16 --record=true
+5         kubectl set image deployment app-deploy web=nginx:1.18 --record=true
+6         kubectl set image deployment app-deploy web=nginx:1.17 --record=true
+kubectl rollout undo deploy app-deploy --to-revision=3
+kubectl rollout history deploy app-deploy
+1         kubectl create --filename=deploymen-exam1.yaml --record=true
+2         kubectl set image deployment app-deploy web=nginx:1.15 --record=true
+5         kubectl set image deployment app-deploy web=nginx:1.18 --record=true
+6         kubectl set image deployment app-deploy web=nginx:1.17 --record=true
+7         kubectl set image deployment app-deploy web=nginx:1.16 --record=true
+kubectl rollout undo deploy app-deploy
+kubectl rollout history deploy app-deploy
+REVISION  CHANGE-CAUSE
+1         kubectl create --filename=deploymen-exam1.yaml --record=true
+2         kubectl set image deployment app-deploy web=nginx:1.15 --record=true
+5         kubectl set image deployment app-deploy web=nginx:1.18 --record=true
+7         kubectl set image deployment app-deploy web=nginx:1.16 --record=true
+8         kubectl set image deployment app-deploy web=nginx:1.17 --record=true
+```
