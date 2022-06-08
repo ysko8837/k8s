@@ -67,8 +67,10 @@ deployment "app-deploy" successfully rolled out
 
 ## record 
   - --record 옵션으로 기록
-  - kubectl rollout status deployment `<name>` 으로 확인
-  - kubectl rollout history deployment `<name>` 으로 확인
+  - status / history / pause / resume
+  - kubectl rollout status deployment `<name>` 
+  - kubectl rollout history deployment `<name>` 
+  - kubectl rollout pause/resume deployment `<name>`
 
 ## pod 삭제
   - 지워도 replica에 의해 계속 재생성됨
