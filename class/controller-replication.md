@@ -4,6 +4,7 @@
   - 부족할 경우 template을 이용해 pod를 추가, 많으면 `최근 생성된 Pod`를 삭제
   - 기본구성 : `selector`, `replicas`, `template`
   - selector의 key:value는 template.metadata.labels로 반드시 포함하고 있어야 함(key:value)
+  - selector의 app: mainui를 replicas수만큼 운영, 없으면 template을 이용해서 pod를 만들어서 
   
 ## deploy를 통한 replica  
 ```
