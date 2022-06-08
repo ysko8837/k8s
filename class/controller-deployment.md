@@ -85,6 +85,7 @@ deployment "app-deploy" successfully rolled out
   - kubectl rollout restart deploy app-deploy # 롤링된 결과를 재시작
   - kubectl rollout undo deploy app-deploy # 이전 revision으로 롤백
   - kubectl rollout undo deploy app-deploy --to-revision=3 # history 3번으로 롤백
+  - history는 가장 마지막 번호가 현재 상태
 
 ```
 kubectl rollout history deploy app-deploy
@@ -116,3 +117,4 @@ REVISION  CHANGE-CAUSE
 7         kubectl set image deployment app-deploy web=nginx:1.16 --record=true
 8         kubectl set image deployment app-deploy web=nginx:1.17 --record=true
 ```
+=> undo는 바로 직전 번호로 바뀜, 한번더 한다면? 7번이 사라지고, 7번이 9번으로 내려오고 현재상태가 됨
