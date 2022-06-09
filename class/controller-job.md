@@ -3,10 +3,18 @@
   - batch 처리는 작업이 완료되면 종료되어야 하고, 실패하면 재시도 해야함
   - job controller는 이름 지원하여 성공적인 완료를 보장
   - `spec.restartPolicy`에 OnFailure, Never 가 가능
+  - https://github.com/237summit/Getting-Start-Kubernetes/blob/main/6/job-exam.yaml 참고
 
 
 
-
+```
+vi job-example.yaml
+kubectl create -f job-example.yaml
+kubectl delete pod centos-job-c86mk # complete이전에는 pod가 재생성됨(50s)
+kubectl get jobs.batch
+kubectl describe job centos-job
+kubectl delete jobs.batch centos-job
+```
 
 
 
