@@ -2,7 +2,7 @@
   - job controller로 실행할 pod를 주기적으로 반복실행
   - data backup, send mail,cleaning tasks 등에 사용
   
-## cron expression " 0 3 1 * *" => 요일상관없이, 매월 1일 3시에 반복
+## cron expression
   - minutes (from 0 to 59)
   - hours (from 0 to 23)
   - day of th month ( from 1 to 31)
