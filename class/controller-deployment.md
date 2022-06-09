@@ -70,7 +70,8 @@ deployment "app-deploy" successfully rolled out
   - status / history / pause / resume 가능
   - spec.revisionHistoryLimit: 10 으로 # history 보관 수 결정 가능
   - spec.progressDeadlineSeconds: 600 # 600초 이상인경우 롤백 됨
-  - spec.strategy.rollingUpdate.maxSurge: 25% 
+  - spec.strategy.rollingUpdate.maxSurge: 25%  # 기존 3개, 25%는 0.75이고 반올림하면 1, 즉 3+1= 최대 4개로 구성됨
+   (숫자가 높으면 여러개를 동시에 롤링 업데이트 가능)
   - kubectl rollout status deployment `<name>` 
   - kubectl rollout history deployment `<name>` 
   - kubectl rollout pause/resume deployment `<name>`
@@ -123,4 +124,11 @@ REVISION  CHANGE-CAUSE
 
 # 4. annotations(yaml을 통한 롤링 업데이트)
   - https://github.com/237summit/Getting-Start-Kubernetes/blob/main/6/deployment-exam2.yaml 참고
-  - 
+  - yaml에 `metadata.annotations.kubernetes.io/change-cause: version 1.14` 추가
+  - history가 간편하게 보임
+```
+ kubectl apply -f deployment-exam2.yaml #create는 생성, apply는 동작중인경우 업데이트
+ kubectl rollout history deployment
+
+```
+
