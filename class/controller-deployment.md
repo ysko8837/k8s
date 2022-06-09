@@ -118,3 +118,4 @@ REVISION  CHANGE-CAUSE
 8         kubectl set image deployment app-deploy web=nginx:1.17 --record=true
 ```
 => undo는 바로 직전 번호로 바뀜, 한번더 한다면? 7번이 9번으로 변경되고 맨 밑으로 내려와 현재 상태가 됨
+=> undo를 계속 반복하면 1.16, 1.17만 반복적으로 바뀜
