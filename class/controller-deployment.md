@@ -119,3 +119,8 @@ REVISION  CHANGE-CAUSE
 ```
 => undo는 바로 직전 번호로 바뀜, 한번더 한다면? 7번이 9번으로 변경되고 맨 밑으로 내려와 현재 상태가 됨
 => undo를 계속 반복하면 1.16, 1.17만 반복적으로 바뀜
+
+
+# 4. annotations(yaml을 통한 롤링 업데이트)
+  - https://github.com/237summit/Getting-Start-Kubernetes/blob/main/6/deployment-exam2.yaml 참고
+  - 
