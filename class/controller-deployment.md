@@ -117,4 +117,4 @@ REVISION  CHANGE-CAUSE
 7         kubectl set image deployment app-deploy web=nginx:1.16 --record=true
 8         kubectl set image deployment app-deploy web=nginx:1.17 --record=true
 ```
-=> undo는 바로 직전 번호로 바뀜, 한번더 한다면? 7번이 사라지고, 7번이 9번으로 내려오고 현재상태가 됨
+=> undo는 바로 직전 번호로 바뀜, 한번더 한다면? 7번이 9번으로 변경되고 맨 밑으로 내려와 현재 상태가 됨
