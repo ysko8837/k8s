@@ -1,4 +1,4 @@
-# Deployment
+# 1. Deployment
   - rolling update 목적
   - replicaSet을 컨트롤해서 pod수를 조절
   - kind가 Deployment인 것만 빼고 ReplicaSet과 100동일하게 사용가능
@@ -40,7 +40,7 @@ kubectl delete pod deploy-nginx-6d75c5dd9b-p56f2 # pod 삭제 (replicaset을 통
 kubectl delete rs deploy-nginx-6d75c5dd9b # replicaset 삭제 (deployment를 통해 자동 재생성됨)
 ```
 
-# Rolling update
+# 2. Rolling update
   - kubectl set --help
   - kubectl set image deployment `<deploy_name> <container_name>=<new_version_image>`
   - 신규 1개 생성 => 기존 1개 제거 (반복)
@@ -80,7 +80,7 @@ deployment "app-deploy" successfully rolled out
   - ReplicationController, ReplicaSet, Deployment, static(/var/lib/kubelet/config.yaml 에서 확인)를 삭제해야 함
   - 상위만 삭제하고 pod를 놔둘경우 --cascade=false 옵션 추가
 
-# Rolling back
+# 3. Rolling back
   - kubectl rollout --help
   - kubectl rollout restart deploy app-deploy # 롤링된 결과를 재시작
   - kubectl rollout undo deploy app-deploy # 이전 revision으로 롤백
