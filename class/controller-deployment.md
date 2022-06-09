@@ -77,7 +77,7 @@ deployment "app-deploy" successfully rolled out
 
 ## pod 삭제
   - 지워도 replica에 의해 계속 재생성됨
-  - ReplicaController, ReplicaSet, Deployment, static(/var/lib/kubelet/config.yaml 에서 확인)를 삭제해야 함
+  - ReplicationController, ReplicaSet, Deployment, static(/var/lib/kubelet/config.yaml 에서 확인)를 삭제해야 함
   - 상위만 삭제하고 pod를 놔둘경우 --cascade=false 옵션 추가
 
 # Rolling back
