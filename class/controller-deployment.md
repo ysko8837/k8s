@@ -129,6 +129,12 @@ REVISION  CHANGE-CAUSE
 ```
  kubectl apply -f deployment-exam2.yaml #create는 생성, apply는 동작중인경우 업데이트
  kubectl rollout history deployment
+ vi deployment-exam2.yaml # annotation의 version과 spec의 nginx버전 변경)
+ kubectl apply -f deployment-exam2.yaml
+ kubectl rollout history deployment
+ REVISION  CHANGE-CAUSE
+ 1         version 1.17
+ 2         version 1.18
 
 ```
 
