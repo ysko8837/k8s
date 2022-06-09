@@ -1,7 +1,7 @@
 # job controller
   - 쿠버네티스는 pod를 running상태로 유지하려고 함
   - batch 처리는 작업이 완료되면 종료되어야 하고, 실패하면 재시도 해야함
-  - job controller는 이름 지원하여 성공적인 완료를 보장
+  - job controller는 이를 지원하여 성공적인 완료를 보장
   - `spec.restartPolicy`에 OnFailure(container를 재시작), Never(리스타트를 안하므로 pod를 재시작 시도함) 가 가능
   - Onfailure는 `spec.backoffLimit`을 써줌(재시작 횟수, default는 6번)
   - 재시작 횟수만큼 실패하면 pod를 삭제하고 작업이 중단됨
