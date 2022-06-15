@@ -1,0 +1,332 @@
+name: "[APP] api-stbox-dev"
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy-after-build:
+        description: "신규 Image 버전 git 에 반영 여부"
+        required: false
+        default: "true"
+      base-image-version:
+        description: "jre base image 버전"
+        required: false
+        default: ""
+
+  repository_dispatch:
+    types: ["api-stbox-dev"]
+
+env:
+  IMAGE_NAME: api-stbox
+  BASE_IMAGE: jre-11-base
+
+  PRIVATE_IMAGE_REGISTRY_URL: nexus:5050
+  PRIVATE_IMAGE_REGISTRY_USER_ID: 아이디
+  PRIVATE_IMAGE_REGISTRY_PASSWORD: 패스워드
+
+  PRIVATE_IMAGE_HOSTED_URL: nexus:5001
+  PRIVATE_IMAGE_HOSTED_USER_ID: 아이디
+  PRIVATE_IMAGE_HOSTED_PASSWORD: 패스워드
+
+  CICD_TOKEN: ghp_토큰
+
+  SVN_REPOSITORY_URL: https://192.168.0.200/svn//DEV/stbox
+  SVN_REPOSITORY_USER_ID: 아이디
+  SVN_REPOSITORY_PASSWORD: 패스워드
+
+  # 빌드 완료시 생성되는 artifact 파일명 pattern
+  ARTIFACT_FILE_PATTERN: api-stbox-0.0.1-SNAPSHOT.jar
+
+  DESTINATION_DIR: build/libs
+  MANIFEST_PATH: ns-bosinternal/api-stbox
+
+jobs:
+  cicd-repo-checkout:
+    name: cicd repo checkout
+    runs-on: self-hosted
+    outputs:
+      build-datetime: ${{ steps.init.outputs.build-datetime }}
+      work-dir: ${{ steps.init.outputs.work-dir }}
+      profile: "dev"   # 개발 profile
+      deploy-after-build: ${{ steps.check-workflow-parameter.outputs.deploy-after-build }}
+      base-image-version: ${{ steps.check-base-image-version-parameter.outputs.image-version }}
+
+    steps:
+      - name: init cicd repo checkout
+        id: init
+        run: |
+          BUILD_DATETIME=$(TZ=Asia/Seoul date +"%Y%m%d-%H%M%S")
+          echo -e "\n[ INFO ]  build-datetime ::: '${BUILD_DATETIME}'\n"
+          echo "::set-output name=build-datetime::${BUILD_DATETIME}"
+          echo "::set-output name=work-dir::$(pwd)"
+      - name: check workflow parameter
+        id: check-workflow-parameter
+        run: |
+          DEPLOY_AFTER_BUILD=""
+          BASE_IMAGE_VERSION=""
+          PARAMETER_1=""
+          echo -e "\n[ INFO ]  빌드 후 배포 진행 여부 ( deploy-after-build ) Parameter Check ::: START\n"
+          if [ ! -z "${{ github.event.inputs.deploy-after-build }}" ]; then
+            echo -e "[ INFO ]  'workflow_dispatch' input Parameter ::: deploy-after-build '${{ github.event.inputs.deploy-after-build }}'"
+            PARAMETER_1=${{ github.event.inputs.deploy-after-build }}
+          elif [ ! -z "${{ github.event.client_payload.deploy-after-build }}" ]; then
+            echo -e "[ INFO ]  'repository_dispatch' client_payload Parameter ::: deploy-after-build '${{ github.event.client_payload.deploy-after-build }}'"
+            PARAMETER_1=${{ github.event.client_payload.deploy-after-build }}
+          else 
+            echo -e "[ WARN ]  Parameter Check ::: 빌드 후 배포 진행 여부 ( deploy-after-build ) 값 전달되지 않음"
+          fi
+          case "${PARAMETER_1}" in
+            "true" | "TRUE" )
+              DEPLOY_AFTER_BUILD="true"
+              ;;
+            "false" | "FALSE" )
+              DEPLOY_AFTER_BUILD="false"
+            ;;
+            * )
+              echo -e "[ ERROR ]  invalid deploy-after-build parameter ::: '${PARAMETER_1}' "
+              echo -e "[ WARN ]   빌드 후 배포 진행 여부 'false' 로 parameter 수정"
+              DEPLOY_AFTER_BUILD="false"
+            ;;
+          esac
+          echo -e "\n[ INFO ]  빌드 후 배포 진행 여부 ( deploy-after-build ) Parameter Check ::: END\n"
+          echo -e "\n[ INFO ]  jre base image 버전 ( base-image-version ) Parameter Check ::: START\n"
+          if [ ! -z "${{ github.event.inputs.base-image-version }}" ]; then
+            echo -e "[ INFO ]  'workflow_dispatch' input Parameter ::: base-image-version '${{ github.event.inputs.base-image-version }}'"
+            BASE_IMAGE_VERSION=${{ github.event.inputs.base-image-version }}
+          elif [ ! -z "${{ github.event.client_payload.base-image-version }}" ]; then
+            echo -e "[ INFO ]  'repository_dispatch' client_payload Parameter ::: base-image-version '${{ github.event.client_payload.base-image-version }}'"
+            BASE_IMAGE_VERSION=${{ github.event.client_payload.base-image-version }}
+          else 
+            echo "[ INFO ]  Parameter Check ::: jre base image 버전 ( base-image-version ) 값 전달되지 않음"
+          fi
+          echo -e "\n[ INFO ]  jre base image 버전 ( base-image-version ) Parameter Check ::: END\n"
+          echo "::set-output name=deploy-after-build::${DEPLOY_AFTER_BUILD}"
+          echo "::set-output name=base-image-version::${BASE_IMAGE_VERSION}"
+      - name: checkout
+        id: checkout
+        run: |
+          rm -rf \
+            * .git .github && \
+          git clone --no-checkout --depth=1 \
+            "https://${{ github.repository_owner }}:${{ env.CICD_TOKEN }}@github.com/${{ github.repository }}.git" \
+            . && \
+          git sparse-checkout set \
+            actions \
+            ${{ env.MANIFEST_PATH }} && \
+          git checkout
+          echo -e "\n[ INFO ]  cicd-repo checkout result\n"
+          ls -al
+      - name: check jre base image version parameter
+        id: check-base-image-version-parameter
+        uses: ./actions/util/check-image-version
+        with:
+          image-name: ${{ env.BASE_IMAGE }}
+          image-version: ${{ steps.check-workflow-parameter.outputs.base-image-version }}
+          private-image-hosted-user-id: ${{ env.PRIVATE_IMAGE_HOSTED_USER_ID }}
+          private-image-hosted-password: ${{ env.PRIVATE_IMAGE_HOSTED_PASSWORD }}
+
+  source-checkout:
+    name: source checkout
+    needs: [cicd-repo-checkout]
+    runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: ${{ needs.cicd-repo-checkout.outputs.work-dir }}
+    outputs:
+      source-checkout-directory-name: ${{ steps.init.outputs.source-checkout-directory-name }}
+      source-checkout-full-path: ${{ steps.init.outputs.source-checkout-full-path }}
+
+    steps:
+      - name: init source checkout
+        id: init
+        run: |
+          # 빌드/실행 Profile
+          PROFILE="${{ needs.cicd-repo-checkout.outputs.profile }}"
+          # 소스 checkout 디렉토리 명 ::: 소스 checkout 시에는 별도 디렉토리 생성
+          SOURCE_CHECKOUT_DIRECTORY_NAME=${{ env.IMAGE_NAME }}-${PROFILE}-${{ needs.cicd-repo-checkout.outputs.build-datetime }}
+          echo "::set-output name=source-checkout-directory-name::${SOURCE_CHECKOUT_DIRECTORY_NAME}"
+          echo "::set-output name=source-checkout-full-path::${{ needs.cicd-repo-checkout.outputs.work-dir }}/${SOURCE_CHECKOUT_DIRECTORY_NAME}"
+      - name: svn-source-checkout
+        uses: ./actions/ci/svn-source-checkout
+        with:
+          svn-repository-url: ${{ env.SVN_REPOSITORY_URL }}
+          svn-repository-user-id: ${{ env.SVN_REPOSITORY_USER_ID }}
+          svn-repository-password: ${{ env.SVN_REPOSITORY_PASSWORD }}
+          source-checkout-full-path: ${{ steps.init.outputs.source-checkout-full-path }}
+
+      - name: clean querydsl generated path
+        id: clean-querydsl-generated-path
+        run: |
+          rm -rf ${{ steps.init.outputs.source-checkout-full-path }}/src/main/generated
+  gradle-build:
+    name: gradle build
+    needs: [cicd-repo-checkout, source-checkout]
+    runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: ${{ needs.source-checkout.outputs.source-checkout-full-path }} # 소스 checkout 경로
+    outputs:
+      artifact-path: ${{ steps.check-build-result.outputs.artifact-path }}
+      artifact-name: ${{ steps.check-build-result.outputs.artifact-name }}
+
+    steps:
+      - name: init gradle build
+        id: init
+        run: |
+          # 빌드/실행 Profile
+          echo "::set-output name=profile::${{ needs.cicd-repo-checkout.outputs.profile }}"
+          # source checkout 경로
+          echo "::set-output name=source-checkout-full-path::${{ needs.source-checkout.outputs.source-checkout-full-path }}"
+      - name: grant execute permission for gradlew
+        run: |
+          chmod +x ./gradlew 
+      - name: build with gradle
+        id: build-with-gradle
+        run: |
+          echo -e "\n[ INFO ]  Gradle Build::: Start\n"
+          ./gradlew clean build
+          echo -e "\n[ INFO ]  Gradle Build::: End\n"
+      - name: check artifact build result
+        id: check-build-result
+        working-directory: ${{ needs.source-checkout.outputs.source-checkout-full-path }}/${{ env.DESTINATION_DIR }}
+        run: |
+          # artifact 파일 경로 : working-directory 와 동일
+          ARTIFACT_PATH=$(pwd)
+          # 빌드 완료시 생성되는 artifact 파일명 pattern
+          ARTIFACT_FILE_PATTERN=${{ env.ARTIFACT_FILE_PATTERN }}
+          # artifact 파일명
+          ARTIFACT_NAME=$( ls ${ARTIFACT_FILE_PATTERN} -1r -I . -I ..  2> /dev/null | head -1 )
+          if [ ! -z "${ARTIFACT_NAME}" -a "${ARTIFACT_NAME}" != " " ]; then
+            echo -e "\n[ INFO ]  Build Result ::: Start\n"
+            echo -e "[ INFO ]  - artifact path ::: '${ARTIFACT_PATH}'"
+            echo -e "[ INFO ]  - artifact name ::: '${ARTIFACT_NAME}'"
+            echo -e "\n[ INFO ]  Build Result ::: End\n"
+          else
+            echo -e "\n[ ERROR ]  Artifact Not Found !!!"
+          fi
+          echo "::set-output name=artifact-path::${ARTIFACT_PATH}"
+          echo "::set-output name=artifact-name::${ARTIFACT_NAME}"
+      - name: cleanup gradle cache
+        # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
+        # Restoring these files from a GitHub Actions cache might cause problems for future builds.
+        run: |
+          rm -f ~/.gradle/caches/modules-2/modules-2.lock
+          rm -f ~/.gradle/caches/modules-2/gc.properties
+  buildah-build:
+    name: buildah build
+    needs: [cicd-repo-checkout, source-checkout, gradle-build]
+    runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: ${{ needs.cicd-repo-checkout.outputs.work-dir }}
+    outputs:
+      base-image-with-version: ${{ steps.init.outputs.base-image-with-version }}
+      new-image-name: ${{ steps.init.outputs.new-image-name }}
+      new-image-version: ${{ steps.init.outputs.new-image-version }}
+      pushed-image-full-url: ${{ steps.push-image.outputs.pushed-image-full-url }}
+
+    steps:
+      - name: Init buildah build
+        id: init
+        run: |
+          # 이전 Job 실행 결과
+          echo "::set-output name=artifact-path::${{ needs.gradle-build.outputs.artifact-path }}"
+          echo "::set-output name=artifact-name::${{ needs.gradle-build.outputs.artifact-name }}"
+          # 버전 정보 포함한 Base Image 의 이름
+          BASE_IMAGE_FULL_URL="${{ env.PRIVATE_IMAGE_REGISTRY_URL }}/${{ env.BASE_IMAGE }}:${{ needs.cicd-repo-checkout.outputs.base-image-version }}"
+          # 빌드/실행 Profile
+          PROFILE="${{ needs.cicd-repo-checkout.outputs.profile }}"
+          # 신규 Image 의 이름
+          NEW_IMAGE_NAME="${{ env.IMAGE_NAME }}-${PROFILE}"
+          # 신규 Image 의 Version
+          NEW_IMAGE_VERSION="${{ needs.cicd-repo-checkout.outputs.build-datetime }}"
+          echo "::set-output name=base-image-full-url::${BASE_IMAGE_FULL_URL}"
+          echo "::set-output name=profile::${PROFILE}"
+          echo "::set-output name=new-image-name::${NEW_IMAGE_NAME}"
+          echo "::set-output name=new-image-version::${NEW_IMAGE_VERSION}"
+      - name: from image
+        id: from-image
+        uses: ./actions/ci/from-image
+        with:
+          image-full-url: ${{ steps.init.outputs.base-image-full-url }}
+          private-image-registry-user-id: ${{ env.PRIVATE_IMAGE_REGISTRY_USER_ID }}
+          private-image-registry-password: ${{ env.PRIVATE_IMAGE_REGISTRY_PASSWORD }}
+
+      - name: generate image
+        id: generate-image
+        run: |
+          rm -rf ~/.config/containers ~/.local/share/containers
+          CONTAINER_ID=${{ steps.from-image.outputs.container-id }}
+          echo -e "\n[ INFO ]  buildah copy ::: Start\n"
+          sudo buildah copy "${CONTAINER_ID}" \
+            "${{ steps.init.outputs.artifact-path }}/${{ steps.init.outputs.artifact-name }}" \
+            /${{ steps.init.outputs.artifact-name }}
+          # entrypoint.sh 생성 / COPY
+          tee ./entrypoint.sh << EOF > /dev/null
+          #!/bin/bash
+          java -Djava.security.egd=file:/dev/./urandom \
+               -Dspring.profiles.active=${{ steps.init.outputs.profile }} \
+               -Djava.net.preferIPv4Stack=true \
+               -jar ${{ steps.init.outputs.artifact-name }}
+          EOF
+          sudo buildah copy "${CONTAINER_ID}" \
+            ./entrypoint.sh \
+            /entrypoint.sh
+          echo -e "\n[ INFO ]  buildah copy ::: End\n"
+          echo -e "\n[ INFO ]  buildah config ::: Start\n"
+          sudo buildah config \
+            --env _BUILDAH_STARTED_IN_USERNS="" \
+            --env BUILDAH_ISOLATION=chroot \
+            "${CONTAINER_ID}"
+          echo -e "\n[ INFO ]  buildah config ::: End\n"
+      - name: commit image
+        id: commit-image
+        uses: ./actions/ci/commit-image
+        with:
+          container-id: ${{ steps.from-image.outputs.container-id }}
+          private-image-hosted-url: ${{ env.PRIVATE_IMAGE_HOSTED_URL }}
+          image-name: ${{ steps.init.outputs.new-image-name }}
+          image-version: ${{ steps.init.outputs.new-image-version }}
+
+      - name: push image
+        id: push-image
+        uses: ./actions/ci/push-image
+        with:
+          image-full-url: ${{ steps.commit-image.outputs.image-full-url }}
+          private-image-hosted-user-id: ${{ env.PRIVATE_IMAGE_HOSTED_USER_ID }}
+          private-image-hosted-password: ${{ env.PRIVATE_IMAGE_HOSTED_PASSWORD }}
+
+  deploy:
+    name: deploy by kustomize
+    needs: [cicd-repo-checkout, source-checkout, gradle-build, buildah-build]
+    runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: ${{ needs.cicd-repo-checkout.outputs.work-dir }}
+
+    steps:
+      - name: log skip deploy message
+        if: "needs.cicd-repo-checkout.outputs.deploy-after-build == 'false'"
+        run: |
+          echo "[ INFO ]  SKIP DEPLOY ::: deploy-after-build parameter '${{ inputs.deploy-after-build }}'"
+      - name: deploy
+        id: deploy
+        uses: ./actions/cd/deploy-by-kustomize
+        if: "needs.cicd-repo-checkout.outputs.deploy-after-build == 'true'"
+        with:
+          overlays-profile: ${{ needs.cicd-repo-checkout.outputs.profile }}
+          manifest-path: ${{ env.MANIFEST_PATH }}
+          private-image-registry-url: ${{ env.PRIVATE_IMAGE_REGISTRY_URL }}
+          image-name: ${{ env.IMAGE_NAME }}
+          new-image-name: ${{ needs.buildah-build.outputs.new-image-name }}
+          new-image-version: ${{ needs.buildah-build.outputs.new-image-version }}
+
+  clean-up-after-build:
+    name: clean up after build
+    needs: [cicd-repo-checkout, source-checkout, gradle-build, buildah-build, deploy]
+    runs-on: self-hosted
+    steps:
+      - name: clean up after build
+        id: clean-up-after-build
+        uses: ./actions/ci/clean-up-after-build
+        with:
+          work-dir: ${{ needs.cicd-repo-checkout.outputs.work-dir }}
